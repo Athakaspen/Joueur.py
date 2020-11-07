@@ -2,6 +2,7 @@
 
 from typing import List
 from joueur.base_ai import BaseAI
+from . import robot
 
 # <<-- Creer-Merge: imports -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 # you can add additional import(s) here
@@ -38,6 +39,9 @@ class AI(BaseAI):
         # <<-- Creer-Merge: start -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         # replace with your start logic
         
+        arobot = robot.Robot()
+        arobot.testFunc()
+
         # <<-- /Creer-Merge: start -->>
 
     def game_updated(self) -> None:

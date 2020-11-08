@@ -1,4 +1,4 @@
-# This is where you build your AI for the Coreminer game.
+#. .T.h.i.s. .is where you build your AI for the Coreminer game.
 
 from typing import List
 from joueur.base_ai import BaseAI

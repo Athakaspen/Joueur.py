@@ -130,12 +130,12 @@ def getIntelliPath(start: 'games.coreminer.tile.Tile', goal: 'games.coreminer.ti
   Returns:
       list[games.coreminer.tile.Tile]: A list of Tiles representing the path, the the first element being a valid adjacent Tile to the start, and the last element being the goal.
   """
-  print("Generating IntelliPath for", bot.miner.id ,"...")
-  print(start.x, start.y, 'to', goal.x, goal.y)
+  #print("Generating IntelliPath for", bot.miner.id ,"...")
+  #print(start.x, start.y, 'to', goal.x, goal.y)
 
   # Used to determine how many tiles we can mine 
   power = min( bot.miner.mining_power, (bot.miner.current_upgrade.cargo_capacity - bot.getCurrentCargo()) )
-  print('power:', power)
+  #print('power:', power)
 
   material = bot.miner.building_materials
 
@@ -170,7 +170,7 @@ def getIntelliPath(start: 'games.coreminer.tile.Tile', goal: 'games.coreminer.ti
         while inspect[0] != start:
           path.insert(0, inspect[0])
           inspect = came_from[inspect[0].id]
-        print("Success!")
+        #print("Success!")
         return path
       # else we did not find the goal, so enqueue this tile's
       # neighbors to be inspected
@@ -187,6 +187,6 @@ def getIntelliPath(start: 'games.coreminer.tile.Tile', goal: 'games.coreminer.ti
 
   # if you're here, that means that there was not a path to get to where
   # you want to go; in that case, we'll just return an empty path.
-  print("No path found :(")
+  #print("No path found :(")
   return []
 

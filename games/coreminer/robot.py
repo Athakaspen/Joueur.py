@@ -30,10 +30,13 @@ class Robot:
 
       # Mine if needed
       if nextPos.ore + nextPos.dirt > 0:
-        if self.miner.mining_power > 0:
-          self.miner.mine(nextPos, -1)
-        else:
-          break
+        if self.miner.mining_power <= 0:
+          # emergency dump
+          print('Emergency Dump from', self.miner.id )
+          for tile in self.miner.tile.get_neighbors():
+            if tile != nextPos:
+              self.miner.dump(tile, 'dirt', -1)
+        self.miner.mine(nextPos, -1)
 
       # Place ladder if needed
       if nextPos.dirt + nextPos.ore <= 0 and not nextPos.is_ladder and not nextPos.is_hopper and nextPos.y != 0:
@@ -65,6 +68,38 @@ class Robot:
       
       if not (nextPos.is_hopper and nextPos == self.miner.tile.tile_south):
         self.miner.move(nextPos)
+  
+  def followPath(self, path):
+    
+    while path and self.miner.moves > 0:
+
+      # get next path tile
+      nextPos = path.pop(0)
+
+      # Check that we haven't overstepped somehow
+      if nextPos not in self.miner.tile.get_neighbors():
+        print("|+|+|+|+|+|+| PATH FAILED |+|+|+|+|+|+|")
+        break
+      
+      # Place ladder at feet if needed
+      if self.miner.tile.dirt + self.miner.tile.ore <= 0 and not self.miner.tile.is_ladder and not self.miner.tile.is_hopper: # placable
+        if (self.miner.tile.tile_north and nextPos == self.miner.tile.tile_north):
+          self.miner.build(self.miner.tile, 'ladder')
+      
+      # mine ahead if needed
+      if nextPos.dirt + nextPos.ore > 0:
+        self.miner.mine(nextPos, -1)
+
+      # place ladder ahead if needed
+      if nextPos.dirt + nextPos.ore <= 0 and not nextPos.is_ladder and not nextPos.is_hopper: # placable
+        if (nextPos.tile_south and nextPos.tile_south.dirt + nextPos.tile_south.ore <= 0) \
+        or (nextPos.tile_north and nextPos.tile_north.dirt + nextPos.tile_north.ore > 0):
+          self.miner.build(nextPos, 'ladder')
+
+      # move
+      if not (nextPos.is_hopper and nextPos == self.miner.tile.tile_south):
+        self.miner.move(nextPos)
+    
     
 
   

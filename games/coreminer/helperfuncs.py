@@ -1,8 +1,15 @@
 from typing import List
 from . import *
+from .tile import Tile
 
 #Gives the added x and y distance of two tiles.
-def Distance(tile1, tile2):
+def Distance(tile1:Tile, tile2:Tile):
+    # if(type(tile1) != 'NoneType' and type(tile2) != 'NoneType'):
+    #     xDis = abs(tile1.x - tile2.x)
+    #     yDis = abs(tile1.y - tile2.y)
+    # else:
+    #     xDis, yDis = 0, 0
+
     xDis = abs(tile1.x - tile2.x)
     yDis = abs(tile1.y - tile2.y)
 

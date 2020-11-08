@@ -19,6 +19,8 @@ class AI(BaseAI):
         self._player = None
         self._settings = {}
         self._robots = []
+        self.pitCount = 0
+        self.termCount = 0
 
     @property
     def game(self) -> 'games.coreminer.game.Game':
@@ -88,13 +90,50 @@ class AI(BaseAI):
         # <<-- Creer-Merge: runTurn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         # Put your game logic here for runTurn
 
-        # If we have no miners and can afford one, spawn one
-        if len(self.player.miners) < 30 and self.player.money >= self.game.spawn_price+400:
-          self.player.spawn_miner()
-          self.robots.append( Pitman(self.player.miners[-1]) )
+        
 
-        for bot in self.robots:
-          bot.performTurn(self.game)
+        if(self.player.base_tile.x != 0):
+            # If we have no miners and can afford one, spawn one
+            if len(self.player.miners) < 30 and self.player.money >= self.game.spawn_price+400:
+                self.player.spawn_miner()
+                self.robots.append( Pitman(self.player.miners[-1]) )
+
+            for bot in self.robots:
+                if(bot.miner.tile == None):
+                    self.robots.remove(bot)
+                bot.performTurn(self.game)
+
+        else:
+            #print(self.termCount, self.pitCount)
+
+            if (self.pitCount < 2 and self.pitCount > 0):
+            #if (self.termCount < (self.pitCount)):
+                #print('inTerm')
+                self.player.spawn_miner()
+                self.robots.append( terminator(self.player.miners[-1], self.player))
+                self.termCount = self.termCount + 1
+            elif (self.pitCount < 5):
+                #print('inPit')
+                self.player.spawn_miner()
+                self.robots.append( Pitman(self.player.miners[-1]) )
+                self.pitCount = self.pitCount + 1
+            
+
+            
+            
+
+            # if len(self.player.miners) < 30 and self.player.money >= self.game.spawn_price+400:
+            #     self.player.spawn_miner()
+            #     self.robots.append( terminator(self.player.miners[-1], self.player))
+
+            # if len(self.player.miners) < 30 and self.player.money >= self.game.spawn_price+400:
+            #     self.player.spawn_miner()
+            #     self.robots.append( Pitman(self.player.miners[-1]) )
+
+            for bot in self.robots:
+                if(bot.miner.tile == None):
+                    self.robots.remove(bot)
+                bot.performTurn(self.game)
 
         # if self.robots[0].miner.dirt > 200 and self.player.base_tile.tile_east:
         #   self.robots[0].moveToward(self.player.base_tile.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south)

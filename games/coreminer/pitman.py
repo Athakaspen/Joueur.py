@@ -20,6 +20,9 @@ class Pitman(Robot):
       self.side = 'right'
 
   def performTurn(self, game):
+    if(self.miner.tile == None):
+        #if(self.miner.health == 0):
+      return
     if self.state == STATE.MINE and self.miner:
       # Move to tile next to base
       if self.miner.tile.x == self.miner.owner.base_tile.x:

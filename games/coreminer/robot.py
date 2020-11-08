@@ -50,7 +50,7 @@ class Robot:
 
     while xdiff > 0:
       path.append(path[-1].tile_east)
-      print("Tile East")
+      #print("Tile East")
       xdiff -= 1
     while xdiff < 0:
       path.append(path[-1].tile_west)
@@ -58,8 +58,8 @@ class Robot:
     
     while ydiff > 0:
       path.append(path[-1].tile_north)
-      print("Tile North")
-      print(ydiff)
+      #print("Tile North")
+      #print(ydiff)
       ydiff -= 1
     while ydiff < 0:
       path.append(path[-1].tile_south)

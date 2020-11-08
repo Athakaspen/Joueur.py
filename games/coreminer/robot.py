@@ -12,6 +12,10 @@ class Robot:
     self.miner = miner
     self.goalPos = None
     self.state = STATE.IDLE
+    if miner.owner.base_tile.tile_east:
+      self.side = 'right'
+    else: 
+      self.side = 'left'
   
   def moveToward(self, goal):
     path = self.getPath(self.miner.tile, goal)

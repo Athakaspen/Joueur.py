@@ -12,6 +12,10 @@ class Robot:
     self.miner = miner
     self.goalPos = None
     self.state = STATE.IDLE
+    if miner.owner.base_tile.tile_east:
+      self.side = 'right'
+    else: 
+      self.side = 'left'
   
   def moveToward(self, goal):
     path = self.getPath(self.miner.tile, goal)
@@ -62,3 +66,6 @@ class Robot:
       ydiff += 1
     
     return path[1:]
+
+  def getCurrentCargo(self):
+    return self.miner.dirt + self.miner.ore + self.miner.building_materials + self.miner.bombs * 10 # 10 is the bomb size

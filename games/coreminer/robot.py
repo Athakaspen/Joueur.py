@@ -30,13 +30,18 @@ class Robot:
 
       # Mine if needed
       if nextPos.ore + nextPos.dirt > 0:
-        self.miner.mine(nextPos, -1)
+        if self.miner.mining_power > 0:
+          self.miner.mine(nextPos, -1)
+        else:
+          break
 
       # Place ladder if needed
-      if nextPos.is_pathable and not nextPos.is_ladder and not nextPos.is_hopper:
+      if nextPos.dirt + nextPos.ore <= 0 and not nextPos.is_ladder and not nextPos.is_hopper:
+        # print("Build 1") # FILLED
         self.miner.build(nextPos, 'ladder')
       
-      self.miner.move(nextPos)
+      if nextPos.dirt + nextPos.ore <= 0 and not (nextPos.is_hopper and nextPos == self.miner.tile.tile_south):
+        self.miner.move(nextPos)
     # self.miner.build(self.miner.tile, 'ladder')
 
   def pathToward(self, goal):
@@ -47,10 +52,12 @@ class Robot:
       nextPos = path.pop(0)
 
       # Place ladder/support if needed
-      if not nextPos.is_ladder and not nextPos.is_hopper:
+      if nextPos.is_pathable and not nextPos.is_ladder and not nextPos.is_hopper:
+        # print("Build 2")
         self.miner.build(nextPos, 'ladder')
       
-      self.miner.move(nextPos)
+      if not (nextPos.is_hopper and nextPos == self.miner.tile.tile_south):
+        self.miner.move(nextPos)
     
 
   

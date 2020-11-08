@@ -15,7 +15,7 @@ class Pitman(Robot):
 
   def performTurn(self, game):
 
-    if self.miner == None or self.miner.tile == None: #no point doin anythin if we dead
+    if self.state == 'dead' or self.miner == None or self.miner.tile == None: #no point doin anythin if we dead
       self.state = 'dead'
       return
 
@@ -46,6 +46,7 @@ class Pitman(Robot):
 
       # build ladder
       if not self.miner.tile.is_ladder and not self.miner.tile.is_hopper:
+        # print("Build 3")
         self.miner.build(self.miner.tile, 'ladder')
 
       # Mine hopper side tile
@@ -56,7 +57,7 @@ class Pitman(Robot):
           self.miner.mine(self.miner.tile.tile_east, -1)
 
       while game.get_tile_at(self.miner.owner.base_tile.x, self.miner.tile.y).dirt==0 and \
-        self.miner.moves > 1 and self.miner.mining_power > 0 and self.state == 'mine' \
+        self.miner.moves > 1 and self.miner.mining_power > 0 \
         and self.miner.current_upgrade.cargo_capacity > self.getCurrentCargo():
 
         # mining the blocks below
@@ -64,19 +65,23 @@ class Pitman(Robot):
           self.miner.mine(self.miner.tile.tile_south, -1)
         if self.miner.tile.tile_south:
           self.miner.move(self.miner.tile.tile_south)
+        else:
+          break
 
         # build ladder
         if not self.miner.tile.is_ladder:
+          # print("Build 4") # MINING POWER
           self.miner.build(self.miner.tile, 'ladder')
 
         # Mine hopper side tile
-        if self.side == 'left' and self.miner.tile.tile_west.dirt + self.miner.tile.tile_west.ore > 0:
+        if self.side == 'left' and self.miner.tile.tile_west.dirt + self.miner.tile.tile_west.ore > 0 and self.miner.mining_power > 0:
           self.miner.mine(self.miner.tile.tile_west, -1)
-        elif self.miner.tile.tile_east.dirt + self.miner.tile.tile_east.ore > 0:
+        elif self.miner.tile.tile_east.dirt + self.miner.tile.tile_east.ore > 0 and self.miner.mining_power > 0:
           self.miner.mine(self.miner.tile.tile_east, -1)
         
       # detect reaching ground
-      if game.get_tile_at(self.miner.owner.base_tile.x, self.miner.tile.y).is_hopper:
+      if game.get_tile_at(self.miner.owner.base_tile.x, 29).is_hopper:
+        print("pitman idling")
         self.state = 'idle'
         
       # move up  
@@ -97,4 +102,6 @@ class Pitman(Robot):
         self.miner.dump(sellTile, "ore", -1)
   
   def restock(self):
-    self.miner.buy('buildingMaterials', 20-self.miner.building_materials)
+    stock = 25
+    if self.miner.building_materials < stock and self.miner.owner.money >= stock-self.miner.building_materials:
+      self.miner.buy('buildingMaterials', stock-self.miner.building_materials)

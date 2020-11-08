@@ -20,7 +20,7 @@ class AI(BaseAI):
         self._player = None
         self._settings = {}
         self._robots = []
-        self._spawnorder = ['pitman', 'digger', 't-100', 'pitman', 'digger', 't-100','pitman', 'digger', 'digger']
+        self._spawnorder = ['pitman', 'digger', 'pitman', 'digger', 'pitman', 'digger', 'digger']
         self._turnCount = 0
 
     @property
@@ -72,6 +72,8 @@ class AI(BaseAI):
         # closestOreTile = helperfuncs.findLocationOfNearest(orelist, self.player.base_tile)
 
         # print(closestOreTile.x, closestOreTile.y)
+
+        print(helperfuncs.getBottomCorner(self.game, self.player).x, helperfuncs.getBottomCorner(self.game, self.player).y )
         
         # <<-- /Creer-Merge: start -->>
 
@@ -110,8 +112,8 @@ class AI(BaseAI):
         self.turnCount += 1
         print('Turn', self.turnCount)
 
-        # If we have no miners and can afford one, spawn one
-        if len(self.player.miners) < 100 and self.player.money >= self.game.spawn_price+500:
+        # If we have no miners and can afford one, spawn 1 more
+        if len(self.player.miners) < 50 and self.player.money >= self.game.spawn_price+500:
 
           nextType = 'digger' # default
           if self.spawnorder:
@@ -136,9 +138,11 @@ class AI(BaseAI):
         for bot in self.robots:
           bot.performTurn(self.game)
           if bot.state == 'idle':
+            print("caught idle")
             self.robots.append(Digger(bot.miner))
             self.robots.remove(bot)
           if bot.state == 'dead':
+            print("caught dead")
             self.robots.append(Digger(bot.miner))
             self.robots.remove(bot)
           # bot.sellall()

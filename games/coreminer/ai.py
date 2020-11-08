@@ -20,7 +20,7 @@ class AI(BaseAI):
         self._player = None
         self._settings = {}
         self._robots = []
-        self._spawnorder = ['pitman', 'digger', 't-100', 'pitman', 'digger', 't-100','pitman', 'digger', 'digger']
+        self._spawnorder = ['pitman', 'digger', 't-100', 'pitman', 'digger', 't-100','pitman', 'digger', 'digger', 't-100', 't-100', 't-100', 't-100']
         self._turnCount = 0
 
     @property
@@ -111,7 +111,7 @@ class AI(BaseAI):
         print('Turn', self.turnCount)
 
         # If we have no miners and can afford one, spawn one
-        if len(self.player.miners) < 10 and self.player.money >= self.game.spawn_price:
+        if len(self.player.miners) < 21 and self.player.money >= self.game.spawn_price:
 
           nextType = 'digger' # default
           if self.spawnorder:
@@ -129,6 +129,9 @@ class AI(BaseAI):
             print ("Spawning Terminator...")
             self.player.spawn_miner()
             self.robots.append( terminator(self.player.miners[-1], self.player) )
+        self.robots[-1].miner.upgrade()
+        self.robots[-1].miner.upgrade()
+        self.robots[-1].miner.upgrade()
 
         for bot in self.robots:
           bot.performTurn(self.game)

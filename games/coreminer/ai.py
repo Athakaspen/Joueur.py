@@ -2,7 +2,7 @@
 
 from typing import List
 from joueur.base_ai import BaseAI
-from . import robot
+from . import helperfuncs
 
 # <<-- Creer-Merge: imports -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 # you can add additional import(s) here
@@ -38,10 +38,13 @@ class AI(BaseAI):
         """
         # <<-- Creer-Merge: start -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         # replace with your start logic
-        
-        arobot = robot.Robot()
-        arobot.testFunc()
+        orelist = helperfuncs.getOrelist(self.game)
+        for ore in orelist:
+            print(ore.ore, ore.dirt, ore.x, ore.y)
+        closestOreTile = helperfuncs.findLocationOfNearest(orelist, self.player.base_tile)
 
+        print(closestOreTile.x, closestOreTile.y)
+        
         # <<-- /Creer-Merge: start -->>
 
     def game_updated(self) -> None:

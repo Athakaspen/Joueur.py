@@ -1,5 +1,6 @@
 from typing import List
 from enum import Enum
+from . import helperfuncs
 
 class STATE(Enum):
   IDLE = 0
@@ -24,20 +25,31 @@ class Robot:
       # get next path tile
       nextPos = path.pop(0)
 
-      # Place ladder/support if needed
-      if nextPos == self.miner.tile.tile_north or nextPos == self.miner.tile.tile_south:
-        self.miner.build(self.miner.tile, 'ladder')
-      elif nextPos == self.miner.tile.tile_east or nextPos == self.miner.tile.tile_west:
-        self.miner.build(self.miner.tile, 'support')
-
       # Mine if needed
       if nextPos.ore + nextPos.dirt > 0:
         self.miner.mine(nextPos, -1)
-      
-      
 
+      # Place ladder if needed
+      if nextPos.is_pathable and not nextPos.is_ladder:
+        self.miner.build(nextPos, 'ladder')
+      
       self.miner.move(nextPos)
-    self.miner.build(self.miner.tile, 'ladder')
+    # self.miner.build(self.miner.tile, 'ladder')
+
+  def pathToward(self, goal):
+    path = helperfuncs.find_path(self.miner.tile, goal)
+    while path and self.miner.moves > 0:
+
+      # get next path tile
+      nextPos = path.pop(0)
+
+      # Place ladder/support if needed
+      if not nextPos.is_ladder:
+        self.miner.build(self.miner.tile, 'ladder')
+      
+      self.miner.move(nextPos)
+    
+
   
   def getPath(self, start:'games.coreminer.tile.Tile', end:'games.coreminer.tile.Tile') -> List:
     
@@ -50,7 +62,6 @@ class Robot:
 
     while xdiff > 0:
       path.append(path[-1].tile_east)
-      #print("Tile East")
       xdiff -= 1
     while xdiff < 0:
       path.append(path[-1].tile_west)
@@ -58,14 +69,22 @@ class Robot:
     
     while ydiff > 0:
       path.append(path[-1].tile_north)
-      #print("Tile North")
-      #print(ydiff)
       ydiff -= 1
     while ydiff < 0:
       path.append(path[-1].tile_south)
       ydiff += 1
     
     return path[1:]
+
+  def sellall(self):
+    # Sell all materials
+    sellTile = None
+    for tile in self.miner.tile.get_neighbors():
+      if tile.is_hopper or tile.is_base:
+        sellTile = tile
+    if sellTile and sellTile.owner == self.miner.owner:
+      self.miner.dump(sellTile, "dirt", -1)
+      self.miner.dump(sellTile, "ore", -1)
 
   def getCurrentCargo(self):
     return self.miner.dirt + self.miner.ore + self.miner.building_materials + self.miner.bombs * 10 # 10 is the bomb size

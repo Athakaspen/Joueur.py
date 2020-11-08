@@ -6,6 +6,7 @@ from . import helperfuncs
 from .terminator import terminator
 from .robot import Robot
 from .pitman import Pitman
+from .digger import Digger
 
 # <<-- Creer-Merge: imports -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 # you can add additional import(s) here
@@ -19,8 +20,8 @@ class AI(BaseAI):
         self._player = None
         self._settings = {}
         self._robots = []
-        self.pitCount = 0
-        self.termCount = 0
+        self._spawnorder = ['pitman', 'digger', 'pitman', 'digger', 'pitman', 'digger', 'digger']
+        self._turnCount = 0
 
     @property
     def game(self) -> 'games.coreminer.game.Game':
@@ -37,6 +38,17 @@ class AI(BaseAI):
     @property
     def robots(self) -> List:
         return self._robots # don't directly touch this "private" variable pls
+    
+    @property
+    def spawnorder(self) -> List:
+        return self._spawnorder # don't directly touch this "private" variable pls
+    
+    @property   
+    def turnCount(self) -> List:
+        return self._turnCount # don't directly touch this "private" variable pls
+    @turnCount.setter
+    def turnCount(self, value):
+      self._turnCount = value
 
     def get_name(self) -> str:
         """This is the name you send to the server so your AI will control the player named this string.
@@ -79,6 +91,11 @@ class AI(BaseAI):
         """
         # <<-- Creer-Merge: end -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         # replace with your end logic
+        for bot in self.robots:
+          if bot.miner.tile:
+            print(bot.miner.tile.x, bot.miner.tile.y, type(bot), bot.state)
+          else:
+            print('dead bot', type(bot), bot.state)
         # <<-- /Creer-Merge: end -->>
 
     def run_turn(self) -> bool:
@@ -90,50 +107,31 @@ class AI(BaseAI):
         # <<-- Creer-Merge: runTurn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         # Put your game logic here for runTurn
 
-        
+        self.turnCount += 1
+        print('Turn', self.turnCount)
 
-        if(self.player.base_tile.x != 0):
-            # If we have no miners and can afford one, spawn one
-            if len(self.player.miners) < 30 and self.player.money >= self.game.spawn_price+400:
-                self.player.spawn_miner()
-                self.robots.append( Pitman(self.player.miners[-1]) )
+        # If we have no miners and can afford one, spawn one
+        if len(self.player.miners) < 10 and self.player.money >= self.game.spawn_price:
 
-            for bot in self.robots:
-                if(bot.miner.tile == None):
-                    self.robots.remove(bot)
-                bot.performTurn(self.game)
+          nextType = 'digger' # default
+          if self.spawnorder:
+            nextType = self.spawnorder.pop(0)
 
-        else:
-            #print(self.termCount, self.pitCount)
+          if nextType == 'pitman':
+            print ("Spawning Pitman...")
+            self.player.spawn_miner()
+            self.robots.append( Pitman(self.player.miners[-1]) )
+          elif nextType == 'digger':
+            print ("Spawning Digger...")
+            self.player.spawn_miner()
+            self.robots.append( Digger(self.player.miners[-1]) )
 
-            if (self.pitCount < 2 and self.pitCount > 0):
-            #if (self.termCount < (self.pitCount)):
-                #print('inTerm')
-                self.player.spawn_miner()
-                self.robots.append( terminator(self.player.miners[-1], self.player))
-                self.termCount = self.termCount + 1
-            elif (self.pitCount < 5):
-                #print('inPit')
-                self.player.spawn_miner()
-                self.robots.append( Pitman(self.player.miners[-1]) )
-                self.pitCount = self.pitCount + 1
-            
-
-            
-            
-
-            # if len(self.player.miners) < 30 and self.player.money >= self.game.spawn_price+400:
-            #     self.player.spawn_miner()
-            #     self.robots.append( terminator(self.player.miners[-1], self.player))
-
-            # if len(self.player.miners) < 30 and self.player.money >= self.game.spawn_price+400:
-            #     self.player.spawn_miner()
-            #     self.robots.append( Pitman(self.player.miners[-1]) )
-
-            for bot in self.robots:
-                if(bot.miner.tile == None):
-                    self.robots.remove(bot)
-                bot.performTurn(self.game)
+        for bot in self.robots:
+          bot.performTurn(self.game)
+          if bot.state == 'idle':
+            self.robots.append(Digger(bot.miner))
+            self.robots.remove(bot)
+          bot.sellall()
 
         # if self.robots[0].miner.dirt > 200 and self.player.base_tile.tile_east:
         #   self.robots[0].moveToward(self.player.base_tile.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south)

@@ -1,29 +1,24 @@
 from typing import List
-from enum import Enum
 from .robot import Robot
 from . import helperfuncs
-
-class STATE(Enum):
-  IDLE = 0
-  MOVE = 1
-  MINE = 2
 
 class Pitman(Robot):
 
   def __init__(self, miner):
     self.miner = miner
     self.goalPos = None
-    self.state = STATE.MINE
+    self.state = 'mine'
     if miner.owner.base_tile.tile_east:
       self.side = 'left'
     else: 
       self.side = 'right'
 
   def performTurn(self, game):
-    if(self.miner.tile == None):
-        #if(self.miner.health == 0):
+
+    if self.miner == None or self.miner.tile == None: #no point doin anythin if we dead
       return
-    if self.state == STATE.MINE and self.miner:
+
+    if self.state == 'mine':
       # Move to tile next to base
       if self.miner.tile.x == self.miner.owner.base_tile.x:
         if self.miner.tile.tile_east:
@@ -40,7 +35,7 @@ class Pitman(Robot):
         else:
           self.miner.move(self.miner.tile.tile_east)
         
-        while self.miner.owner.money > 600 and self.miner.upgrade_level < 3:
+        while self.miner.owner.money > 600 and self.miner.upgrade_level < 3 and self.miner.tile.is_hopper:
           self.miner.upgrade()
         return
       
@@ -60,7 +55,7 @@ class Pitman(Robot):
           self.miner.mine(self.miner.tile.tile_east, -1)
 
       while game.get_tile_at(self.miner.owner.base_tile.x, self.miner.tile.y).dirt==0 and \
-        self.miner.moves > 0 and self.miner.mining_power > 0 and self.state == STATE.MINE \
+        self.miner.moves > 1 and self.miner.mining_power > 0 and self.state == 'mine' \
         and self.miner.current_upgrade.cargo_capacity > self.getCurrentCargo():
 
         # mining the blocks below
@@ -79,7 +74,7 @@ class Pitman(Robot):
         
         # detect reaching ground
         if self.miner.tile.y >= 29 and game.get_tile_at(self.miner.owner.base_tile.x, self.miner.tile.y).dirt==0:
-          self.state = STATE.IDLE
+          self.state = 'idle'
         
       # move up  
       # if game.get_tile_at(self.miner.owner.base_tile.x, self.miner.tile.y).dirt!=0:

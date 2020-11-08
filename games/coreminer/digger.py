@@ -18,6 +18,8 @@ class Digger(Robot):
     if self.miner == None or self.miner.tile == None: #no point doin anythin if we dead
       return
     
+
+
     # Get away from the base
     if self.state == 'init':
       if self.side == 'left':
@@ -93,4 +95,5 @@ class Digger(Robot):
   
   def restock(self):
     self.miner.buy('buildingMaterials', 60-self.miner.building_materials)
+    #self.miner.buy('bomb', 1)
 

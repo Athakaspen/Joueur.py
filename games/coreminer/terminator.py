@@ -177,7 +177,7 @@ class terminator(Robot):
             print(closestRobo)
             if(self.miner.tile == closestRobo):
                 print('Im vibing with enemy')
-                self.miner.dump(self.miner.tile, 'bomb', 1)
+                self.miner.dump(self.miner.tile, 'bomb', 5)
 
             if(closestRobo != None):
                 #self.moveToward(closestRobo)

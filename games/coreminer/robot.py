@@ -36,8 +36,7 @@ class Robot:
           break
 
       # Place ladder if needed
-      if nextPos.dirt + nextPos.ore <= 0 and not nextPos.is_ladder and not nextPos.is_hopper:
-        # print("Build 1") # FILLED
+      if nextPos.dirt + nextPos.ore <= 0 and not nextPos.is_ladder and not nextPos.is_hopper and nextPos.y != 0:
         self.miner.build(nextPos, 'ladder')
       
       if nextPos.dirt + nextPos.ore <= 0 and not (nextPos.is_hopper and nextPos == self.miner.tile.tile_south):
@@ -51,9 +50,17 @@ class Robot:
       # get next path tile
       nextPos = path.pop(0)
 
+      # Check that we haven't overstepped somehow
+      if nextPos not in self.miner.tile.get_neighbors():
+        break
+
+      # build ladder in current position
+      if self.miner.tile.dirt + self.miner.tile.ore <= 0 and not self.miner.tile.is_ladder and not self.miner.tile.is_hopper \
+        and self.miner.tile.tile_north and nextPos == self.miner.tile.tile_north and self.miner.tile.y != 0:
+        self.miner.build(self.miner.tile, 'ladder')
+
       # Place ladder/support if needed
-      if nextPos.is_pathable and not nextPos.is_ladder and not nextPos.is_hopper:
-        # print("Build 2")
+      if nextPos.dirt + nextPos.ore <= 0 and not nextPos.is_ladder and not nextPos.is_hopper and nextPos.y != 0:
         self.miner.build(nextPos, 'ladder')
       
       if not (nextPos.is_hopper and nextPos == self.miner.tile.tile_south):

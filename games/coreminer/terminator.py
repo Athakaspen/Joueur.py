@@ -9,6 +9,9 @@ class terminator(Robot):
         
         self.player = player
 
+        self.miner.buy('bomb', 3)
+        self.miner.buy('buildingMaterials', 50)
+
     def getEnemyList(self):
         enemyTileList = []
         minerList = self.game.miners
@@ -22,16 +25,30 @@ class terminator(Robot):
         return enemyTileList
 
     def performTurn(self, game):
+
         if(self.miner.tile == None):
-        #if(self.miner.health == 0):
             self.state = 'dead'
             return
+
         self.game = game
         #Find the nearest enemy to terminate.
         closestRobo = helperfuncs.findLocationOfNearest(self.getEnemyList(), self.miner.tile)
-        closestHopper = game.get_tile_at(self.player.base_tile.x, self.miner.tile.y)
         print('closestRobo:', closestRobo)
-        print('closestHopper:', closestHopper)
+
+        if(closestRobo != None):
+          print('Moving towards enemy')
+          self.moveToward(closestRobo)
+        
+        surroundingTiles = self.miner.tile.get_neighbors()
+        surroundingTiles.append(self.miner.tile)
+        for nextTile in surroundingTiles:
+          if nextTile in self.getEnemyList():
+            print('Im vibing with enemy')
+            self.miner.dump(self.miner.tile, 'bomb', 3)
+        
+        
+        
+
 
         # if ((self.miner.dirt + self.miner.ore + self.miner.bombs) > 240):
 
@@ -60,57 +77,49 @@ class terminator(Robot):
         #         if(closestRobo != None):
         #             self.moveToward(closestRobo)
 
-        #Check if I need to dump shit
-        if (self.getCurrentCargo() > 240):
-            print('Dumping shit because cargo is:', self.getCurrentCargo)
-            surroundingTiles = self.miner.tile.get_neighbors()
-            for nextTile in surroundingTiles:
-                if(nextTile == closestHopper):
-                    self.miner.dump(nextTile, 'dirt', -1)
-                    self.miner.dump(nextTile, 'ore', -1)
-            if(closestHopper != None):
-                self.moveToward(closestHopper)
-        #Check if I need to buy shit
-        elif(self.miner.building_materials < 5):
-            print('Buying building materials')
-            if(closestHopper != None):
-                if(self.miner.tile != self.player.base_tile):
-                    self.moveToward(closestHopper)
-                else:
-                    if(self.player.base_tile.x != 0):
-                        self.moveToward(self.game.get_tile_at(self.miner.tile.x - 1, self.miner.tile.y))
-                        self.moveToward(self.game.get_tile_at(self.miner.tile.x, self.miner.tile.y + 1))
-                    else:
-                        self.moveToward(self.game.get_tile_at(self.miner.tile.x + 1, self.miner.tile.y))
-                        self.moveToward(self.game.get_tile_at(self.miner.tile.x, self.miner.tile.y + 1))
+        # #Check if I need to dump shit
+        # if (self.getCurrentCargo() > 240):
+        #     print('Dumping shit because cargo is:', self.getCurrentCargo)
+        #     surroundingTiles = self.miner.tile.get_neighbors()
+        #     for nextTile in surroundingTiles:
+        #         if(nextTile == closestHopper):
+        #             self.miner.dump(nextTile, 'dirt', -1)
+        #             self.miner.dump(nextTile, 'ore', -1)
+        #     if(closestHopper != None):
+        #         self.moveToward(closestHopper)
+        # #Check if I need to buy shit
+        # elif(self.miner.building_materials < 5):
+        #     print('Buying building materials')
+        #     if(closestHopper != None):
+        #         if(self.miner.tile != self.player.base_tile):
+        #             self.moveToward(closestHopper)
+        #         else:
+        #             if(self.player.base_tile.x != 0):
+        #                 self.moveToward(self.game.get_tile_at(self.miner.tile.x - 1, self.miner.tile.y))
+        #                 self.moveToward(self.game.get_tile_at(self.miner.tile.x, self.miner.tile.y + 1))
+        #             else:
+        #                 self.moveToward(self.game.get_tile_at(self.miner.tile.x + 1, self.miner.tile.y))
+        #                 self.moveToward(self.game.get_tile_at(self.miner.tile.x, self.miner.tile.y + 1))
 
-            if(self.miner.tile == closestHopper):
-                self.miner.buy('buildingMaterials', 50)
-        elif(self.miner.bombs < 1):
-            print('Buying bombs')
-            if(closestHopper != None):
-                if(self.miner.tile != self.player.base_tile):
-                    self.moveToward(closestHopper)
-                else:
-                    if(self.player.base_tile.x != 0):
-                        self.moveToward(self.game.get_tile_at(self.miner.tile.x - 1, self.miner.tile.y))
-                        self.moveToward(self.game.get_tile_at(self.miner.tile.x, self.miner.tile.y + 1))
-                    else:
-                        self.moveToward(self.game.get_tile_at(self.miner.tile.x + 1, self.miner.tile.y))
-                        self.moveToward(self.game.get_tile_at(self.miner.tile.x, self.miner.tile.y + 1))
+        #     if(self.miner.tile == closestHopper):
+        #         self.miner.buy('buildingMaterials', 50)
+        # elif(self.miner.bombs < 1):
+        #     print('Buying bombs')
+        #     if(closestHopper != None):
+        #         if(self.miner.tile != self.player.base_tile):
+        #             self.moveToward(closestHopper)
+        #         else:
+        #             if(self.player.base_tile.x != 0):
+        #                 self.moveToward(self.game.get_tile_at(self.miner.tile.x - 1, self.miner.tile.y))
+        #                 self.moveToward(self.game.get_tile_at(self.miner.tile.x, self.miner.tile.y + 1))
+        #             else:
+        #                 self.moveToward(self.game.get_tile_at(self.miner.tile.x + 1, self.miner.tile.y))
+        #                 self.moveToward(self.game.get_tile_at(self.miner.tile.x, self.miner.tile.y + 1))
 
-            if(self.miner.tile == closestHopper):
-                self.miner.buy('bomb', 5)
+        #     if(self.miner.tile == closestHopper):
+        #         self.miner.buy('bomb', 5)
         
         #Check if I can terminate
-        else:
-            print('Moving towards enemy')
-            # surroundingTiles = self.miner.tile.get_neighbors()
-            # for nextTile in surroundingTiles:
-            print(closestRobo)
-            if(self.miner.tile == closestRobo):
-                print('Im vibing with enemy')
-                self.miner.dump(self.miner.tile, 'bomb', 1)
-
-            if(closestRobo != None):
-                self.moveToward(closestRobo)
+    
+       
+        

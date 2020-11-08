@@ -3,6 +3,7 @@
 from typing import List
 from joueur.base_ai import BaseAI
 from . import helperfuncs
+from .terminator import terminator
 
 # <<-- Creer-Merge: imports -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
 # you can add additional import(s) here
@@ -74,12 +75,18 @@ class AI(BaseAI):
         # Put your game logic here for runTurn
 
         # If we have no miners and can afford one, spawn one
-        if len(self.player.miners) < 1 and self.player.money >= self.game.spawn_price:
+        if len(self.player.miners) < 2 and self.player.money >= self.game.spawn_price:
             self.player.spawn_miner()
+
+        aTerminator = terminator(self.player.miners[0], self.game, self.player)
+        aTerminator.doJob()
 
         # For each miner
         for miner in self.player.miners:
             if not miner or not miner.tile:
+                continue
+            
+            if miner == self.player.miners[0]:
                 continue
 
             # Move to tile next to base
@@ -116,6 +123,8 @@ class AI(BaseAI):
                 if miner.tile.tile_south:
                     miner.mine(miner.tile.tile_south, -1)
             
+
+
         return True
         # <<-- /Creer-Merge: runTurn -->>
 

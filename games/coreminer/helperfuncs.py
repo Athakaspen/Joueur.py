@@ -19,9 +19,12 @@ def getOrelist(game):
     return orelist
 
 
-def findLocationOfNearest(tileList, startingTile):
-    closestile = tileList[0]
-
+def findLocationOfNearest(tileList:List['games.coreminer.tile.Tile'], startingTile):
+    if(tileList != []):
+        closestile = tileList[0]
+    else:
+        closestile = None
+    
     for tile in tileList:
         if (Distance(tile, startingTile) < Distance(closestile, startingTile)):
             closestile = tile

@@ -23,7 +23,7 @@ class Robot:
       # Place ladder/support if needed
       if nextPos == self.miner.tile.tile_north or nextPos == self.miner.tile.tile_south:
         self.miner.build(self.miner.tile, 'ladder')
-      elif nextPos == self.miner.tile.tile_east or nextPos == self.miner.tile.tile_east:
+      elif nextPos == self.miner.tile.tile_east or nextPos == self.miner.tile.tile_west:
         self.miner.build(self.miner.tile, 'support')
 
       # Mine if needed

@@ -20,7 +20,7 @@ class Pitman(Robot):
       self.side = 'right'
 
   def performTurn(self, game):
-    if self.state == STATE.MINE:
+    if self.state == STATE.MINE and self.miner:
       # Move to tile next to base
       if self.miner.tile.x == self.miner.owner.base_tile.x:
         if self.miner.tile.tile_east:
@@ -36,7 +36,9 @@ class Pitman(Robot):
           self.miner.move(self.miner.tile.tile_west)
         else:
           self.miner.move(self.miner.tile.tile_east)
-        self.miner.upgrade()
+        
+        while self.miner.owner.money > 600 and self.miner.upgrade_level < 3:
+          self.miner.upgrade()
         return
       
       # move to bottom
@@ -47,8 +49,8 @@ class Pitman(Robot):
       if not self.miner.tile.is_ladder:
         self.miner.build(self.miner.tile, 'ladder')
 
+      # Mine hopper side tile
       if game.get_tile_at(self.miner.owner.base_tile.x, self.miner.tile.y).dirt!=0:
-        # Mine hopper side tile
         if self.side == 'left':
           self.miner.mine(self.miner.tile.tile_west, -1)
         else:
@@ -61,6 +63,7 @@ class Pitman(Robot):
         # mining the blocks below
         if self.miner.tile.tile_south:
           self.miner.mine(self.miner.tile.tile_south, -1)
+        self.miner.move(self.miner.tile.tile_south)
 
         # build ladder
         self.miner.build(self.miner.tile, 'ladder')
@@ -75,8 +78,9 @@ class Pitman(Robot):
         if self.miner.tile.y >= 29 and game.get_tile_at(self.miner.owner.base_tile.x, self.miner.tile.y).dirt==0:
           self.state = STATE.IDLE
         
-      if game.get_tile_at(self.miner.owner.base_tile.x, self.miner.tile.y).dirt!=0:
-        self.miner.move(self.miner.tile.tile_north)
+      # move up  
+      # if game.get_tile_at(self.miner.owner.base_tile.x, self.miner.tile.y).dirt!=0:
+      #   self.miner.move(self.miner.tile.tile_north)
       
       
   def sellall(self):

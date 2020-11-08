@@ -95,7 +95,7 @@ class AI(BaseAI):
           if bot.miner.tile:
             print(bot.miner.tile.x, bot.miner.tile.y, type(bot), bot.state)
           else:
-            print('dead bot', type(bot), bot.state)
+            print('DEAD', type(bot), bot.state)
         # <<-- /Creer-Merge: end -->>
 
     def run_turn(self) -> bool:
@@ -111,7 +111,7 @@ class AI(BaseAI):
         print('Turn', self.turnCount)
 
         # If we have no miners and can afford one, spawn one
-        if len(self.player.miners) < 10 and self.player.money >= self.game.spawn_price:
+        if len(self.player.miners) < 100 and self.player.money >= self.game.spawn_price+500:
 
           nextType = 'digger' # default
           if self.spawnorder:
@@ -129,10 +129,16 @@ class AI(BaseAI):
             print ("Spawning Terminator...")
             self.player.spawn_miner()
             self.robots.append( terminator(self.player.miners[-1], self.player) )
+          self.robots[-1].miner.upgrade()
+          self.robots[-1].miner.upgrade()
+          self.robots[-1].miner.upgrade()
 
         for bot in self.robots:
           bot.performTurn(self.game)
           if bot.state == 'idle':
+            self.robots.append(Digger(bot.miner))
+            self.robots.remove(bot)
+          if bot.state == 'dead':
             self.robots.append(Digger(bot.miner))
             self.robots.remove(bot)
           # bot.sellall()

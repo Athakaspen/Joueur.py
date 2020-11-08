@@ -24,6 +24,7 @@ class terminator(Robot):
     def performTurn(self, game):
         if(self.miner.tile == None):
         #if(self.miner.health == 0):
+            self.state = 'dead'
             return
         self.game = game
         #Find the nearest enemy to terminate.

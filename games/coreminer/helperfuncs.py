@@ -49,6 +49,9 @@ def findLocationOfNearest(tileList:List['games.coreminer.tile.Tile'], startingTi
     
     return closestile
     
+def getBottomCorner(game, player):
+  return game.get_tile_at(player.base_tile.x, 29)
+
 
 def find_path(start: 'games.coreminer.tile.Tile', goal: 'games.coreminer.tile.Tile') -> List['games.coreminer.tile.Tile']:
   """A very basic path finding algorithm (Breadth First Search) that when given a starting Tile, will return a valid path to the goal Tile.

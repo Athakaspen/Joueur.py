@@ -16,7 +16,12 @@ class Digger(Robot):
   def performTurn(self, game):
     
     if self.miner == None or self.miner.tile == None: #no point doin anythin if we dead
+      self.state = 'dead'
       return
+    
+    # Things break if there's no ore
+    if not helperfuncs.getOrelist(game):
+      self.state = 'dump'
     
     # Get away from the base
     if self.state == 'init':
@@ -25,22 +30,42 @@ class Digger(Robot):
       else:
         self.miner.move(self.miner.tile.tile_west)
       self.miner.move(self.miner.tile.tile_south)
-      self.state = 'mine'
+      
+      # send it to the bottom
+      self.goalPos = helperfuncs.getBottomCorner(game, self.miner.owner)
+      goalPos = helperfuncs.getBottomCorner(game, self.miner.owner)
+      if self.side == 'left':
+        goalPos = goalPos.tile_east
+      else:
+        goalPos = goalPos.tile_west
+      while not goalPos.is_ladder or goalPos.y == 0:
+        goalPos = goalPos.tile_north
+      self.state = 'goto'
     
-    if self.getCurrentCargo() >= self.miner.current_upgrade.cargo_capacity * 0.8 \
+    if self.miner.tile.dirt + self.miner.tile.ore > 0:
+      self.state = 'stuck'
+    elif self.getCurrentCargo() >= self.miner.current_upgrade.cargo_capacity * 0.8 \
       or self.miner.building_materials <=20:
       self.state = 'dump'
     elif self.getCurrentCargo() <= self.miner.current_upgrade.cargo_capacity * 0.3 \
       and self.miner.building_materials >= 5 and self.state != 'drop':
       self.state = 'mine'
     
+    
     # TODO: Evasive maneuvers
 
-    
+    # get out of the hopper
+    if self.miner.tile.is_hopper:
+      if self.side == 'left':
+        self.miner.move(self.miner.tile.tile_east)
+      else:
+        self.miner.move(self.miner.tile.tile_west)
+
     # Go out and get ore
-    if self.state == 'mine':
+    if self.state == 'mine' and self.miner.tile:
       goalPos = helperfuncs.findLocationOfNearest(helperfuncs.getOrelist(game), self.miner.tile)
-      if helperfuncs.Distance(goalPos, self.miner.tile) > 15:
+      
+      if goalPos and self.miner.tile and helperfuncs.Distance(goalPos, self.miner.tile) > 15:
         self.state = 'drop'
       self.moveToward(goalPos)
 
@@ -62,14 +87,17 @@ class Digger(Robot):
     
     elif self.state == 'drop':
       # get ladder column spot
-      goalPos = helperfuncs.findLocationOfNearest(self.miner.owner.hopper_tiles, self.miner.tile)
+      goalPos = helperfuncs.getBottomCorner(game, self.miner.owner)
       if self.side == 'left':
         goalPos = goalPos.tile_east
       else:
         goalPos = goalPos.tile_west
+      
+      if self.miner.tile == goalPos or helperfuncs.Distance(goalPos, self.miner.tile) < 10:
+        self.state = 'mine'
 
       # mine if possible, otherwise path intelligishently
-      if self.miner.building_materials >= 5 and self.getCurrentCargo() < self.miner.current_upgrade.cargo_capacity * 0.9:
+      if self.miner.building_materials >= 20 and self.getCurrentCargo() < self.miner.current_upgrade.cargo_capacity * 0.9:
         self.moveToward(goalPos)
       else:
         self.pathToward(goalPos)
@@ -88,9 +116,11 @@ class Digger(Robot):
       if tile.is_hopper or tile.is_base:
         sellTile = tile
     if sellTile and sellTile.owner == self.miner.owner:
-      self.miner.dump(sellTile, "dirt", -1)
-      self.miner.dump(sellTile, "ore", -1)
-  
+      if self.miner.dirt:
+        self.miner.dump(sellTile, "dirt", -1)
+      if self.miner.ore:
+        self.miner.dump(sellTile, "ore", -1)
+
   def restock(self):
-    self.miner.buy('buildingMaterials', 60-self.miner.building_materials)
+    self.miner.buy('buildingMaterials', 70-self.miner.building_materials)
 

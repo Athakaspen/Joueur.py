@@ -89,7 +89,7 @@ class AI(BaseAI):
         # Put your game logic here for runTurn
 
         # If we have no miners and can afford one, spawn one
-        if len(self.player.miners) < 3 and self.player.money >= self.game.spawn_price:
+        if len(self.player.miners) < 30 and self.player.money >= self.game.spawn_price+400:
           self.player.spawn_miner()
           self.robots.append( Pitman(self.player.miners[-1]) )
 

@@ -20,7 +20,7 @@ class AI(BaseAI):
         self._player = None
         self._settings = {}
         self._robots = []
-        self._spawnorder = ['pitman', 'digger', 'pitman', 'digger', 'pitman', 'digger', 'digger']
+        self._spawnorder = ['pitman', 'digger', 't-100', 'pitman', 'digger', 't-100','pitman', 'digger', 'digger']
         self._turnCount = 0
 
     @property
@@ -125,13 +125,17 @@ class AI(BaseAI):
             print ("Spawning Digger...")
             self.player.spawn_miner()
             self.robots.append( Digger(self.player.miners[-1]) )
+          elif nextType == 't-100':
+            print ("Spawning Terminator...")
+            self.player.spawn_miner()
+            self.robots.append( terminator(self.player.miners[-1], self.player) )
 
         for bot in self.robots:
           bot.performTurn(self.game)
           if bot.state == 'idle':
             self.robots.append(Digger(bot.miner))
             self.robots.remove(bot)
-          bot.sellall()
+          # bot.sellall()
 
         # if self.robots[0].miner.dirt > 200 and self.player.base_tile.tile_east:
         #   self.robots[0].moveToward(self.player.base_tile.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_east.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south.tile_south)

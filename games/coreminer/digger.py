@@ -15,7 +15,7 @@ class Digger(Robot):
   
   def performTurn(self, game):
     
-    if self.miner == None: #no point doin anythin if we dead
+    if self.miner == None or self.miner.tile == None: #no point doin anythin if we dead
       return
     
     # Get away from the base

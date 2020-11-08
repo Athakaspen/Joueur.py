@@ -95,7 +95,7 @@ class AI(BaseAI):
         # replace with your end logic
         for bot in self.robots:
           if bot.miner.tile:
-            print(bot.miner.tile.x, bot.miner.tile.y, type(bot), bot.state)
+            print(bot.miner.tile.x, bot.miner.tile.y, bot.miner.id, type(bot), bot.state)
           else:
             print('DEAD', type(bot), bot.state)
         # <<-- /Creer-Merge: end -->>
@@ -144,7 +144,8 @@ class AI(BaseAI):
           if bot.state == 'dead':
             print("caught dead")
             self.robots.remove(bot)
-            self.spawnorder.insert(0, 't-100')
+            if bot is terminator: # or bot is terminator2:
+              self.spawnorder.insert(0, 't-100')
           # bot.sellall()
 
         # if self.robots[0].miner.dirt > 200 and self.player.base_tile.tile_east:

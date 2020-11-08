@@ -70,16 +70,28 @@ class Digger(Robot):
     if self.state == 'mine' and self.miner.tile:
       goalPos = helperfuncs.findLocationOfNearest(helperfuncs.getOrelist(game), self.miner.tile)
       
-      # if goalPos and self.miner.tile and helperfuncs.Distance(goalPos, self.miner.tile) > 15:
-      #   self.state = 'drop'
-      self.moveToward(goalPos)
+      # Intellipath TM
+      path = helperfuncs.getIntelliPath(self.miner.tile, goalPos, self)
+      if path:
+        self.followPath(path)
+      else:
+        self.moveToward(goalPos)
 
     # Drop off ore and restock building materials
     elif self.state == 'dump':
 
       if not self.miner.tile.is_hopper:
         goalPos = helperfuncs.findLocationOfNearest(self.miner.owner.hopper_tiles, self.miner.tile)
-        self.pathToward(goalPos)
+        
+        # Intellipath TM
+        path = helperfuncs.getIntelliPath(self.miner.tile, goalPos, self)
+        if path:
+          self.followPath(path)
+        else:
+          if helperfuncs.alternate(game):
+            self.moveToward(goalPos)
+          else:
+            self.pathToward(goalPos)
       
       if self.miner.tile.is_hopper:
         self.sellall()
@@ -107,8 +119,9 @@ class Digger(Robot):
 
     elif self.state == 'stuck':
       # dig self out, then retry performTurn()
-      self.miner.mine(self.miner.tile, -1)
-      self.performTurn(game)
+      if self.miner.mining_power > 0 and self.getCurrentCargo() < self.miner.current_upgrade.cargo_capacity:
+        self.miner.mine(self.miner.tile, -1)
+        self.performTurn(game)
       return
     
     elif self.state == 'goto':
@@ -134,7 +147,7 @@ class Digger(Robot):
         self.miner.dump(sellTile, "ore", -1)
 
   def restock(self):
-    stock = 50
+    stock = 55
     if self.miner.building_materials < stock and self.miner.owner.money >= stock-self.miner.building_materials:
       self.miner.buy('buildingMaterials', stock-self.miner.building_materials)
 
